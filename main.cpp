@@ -16,7 +16,20 @@
 #define SOFT_RESET 0xFE
 
 #define SLA 0x40
-#define Th_Temp 32
+#define Th_Temp 25
+#define Th_humid 90
+
+enum buttonstate////////////////////////////////////this is for the button and debouncing process
+	{
+		waitpress, dbpress, waitrelse, dbrelse
+};
+volatile buttonstate bstate = waitpress; //volatile variable set as initial state
+
+enum fanstate{
+  off, on
+};
+volatile fanstate fstate = off;
+	
 
 int main(){
   Serial.begin(9600); // using serial port to print values from I2C bus
@@ -47,6 +60,36 @@ int main(){
   initPWMTimer3();
   while(1){
 
+    switch(bstate){
+      case waitpress:
+      break;
+      case dbpress:
+      delayMs(1);
+      bstate = waitrelse;
+      break;
+      case waitrelse:
+      break;
+      case dbrelse:
+      delayMs(1);
+      bstate = waitpress;
+      break;
+    }
+
+    switch(fstate){
+      case on:
+      break;
+      case off:
+      break;
+    }
+
+    if(fstate ==  on){
+      L293D_clockwise();
+    }
+    else if(fstate == off){
+      STOP_motor();
+    }
+
+
     delayMs(2000);
     tempReading = HoldCommunication(SLA, TEMPMEASURE);
     tempReading = (tempReading & 0xFFFC);
@@ -70,11 +113,11 @@ int main(){
     moveCursor(1,4);
     writeString(humidPrint);
 
-    if(tempOut > Th_Temp){
-      L293D_clockwise();
+    if(tempOut > Th_Temp && humidOut < Th_humid){
+      fstate = on;
     }
     else {
-      STOP_motor();
+      fstate = off;
     }
     _delay_ms(1000);
 
@@ -83,3 +126,19 @@ int main(){
 
   return 0;
 }
+
+ISR(PCINT0_vect){
+    if (bstate == waitpress){
+      bstate = dbpress;
+    }
+    
+    else if (bstate == waitrelse){
+    if (fstate = on){
+      fstate = off;
+    }
+    else{
+      fstate = off;
+    }
+    bstate = dbrelse;
+    }
+	}

@@ -2,7 +2,7 @@
 // Net ID:         osmansyed
 // Date:04/06\2003
 // Assignment: Lab 4
-// pwm
+//
 
 
 
@@ -18,28 +18,22 @@
 void initPWMTimer1(){
 //here we using OC1B so portb6
  DDRB |=(1 << PB6); //setting it b6 as output
-
 //setting fast mode for OCr1A with variable register, mode 15
 //choose TTCR (timer count regeister names from datasheet) 
 //in our case wgm 10 and 11 are in TCCR1A and the rest are in TCCR1B
 TCCR1A |= (1 << WGM11) | (1 << WGM10);
 TCCR1B |= (1 << WGM12) | (1 << WGM13);
-
 //choose non inverting mode
 //here we use COM1B because OCR1B is what we use for duty cycle calculation 
 //(because OCR1A is the frequency so we can't use that)
 TCCR1A |= (1<< COM1B1); //data sheet for com1b1 and com1b0 for non inverting mode
 TCCR1A &= ~(1 << COM1B0);
-
 //setting prescaler to 8 
 TCCR1B |= (1 << CS10);
 TCCR1B &= ~( (1<<CS11) | (1<<CS12) );
-
 //setting frequency using OCR1A by calculation
 //freq_pwm = freq_io/ (prescaler(1 + OCR1A)) , 100Hz is freq_pwm for us
-
 OCR1A = 1023; //gives us as same as fast 10 bit mode
-
 //setting duty cycle to be a tenth of OCR1A , i.e ocr1a = 10%
 OCR1B = 0;
 }
