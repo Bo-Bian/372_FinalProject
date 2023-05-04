@@ -52,35 +52,13 @@ void write(unsigned char data){
     wait_for_completion;
 }
 
-//takes given slave module address and internal memory address to directly read data from
-void read_from(unsigned char SLA, unsigned char MEMADDRESS){
-    startI2C_Trans(SLA); //starts transmission with given slave module
-
-    write(MEMADDRESS); //writes to MEMADDRESS
-
-    //trigger action and REstart condition to begin reading from internal memory address just written in
-    TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTA); 
-    wait_for_completion;
-
-    TWDR = (SLA << 1) | READ_BIT; //slave address + read bit into data register
-
-    TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWEA); //trigger action with master ACK bit to continue reading next byte
-    wait_for_completion;
-
-    TWCR = (1 << TWINT) | (1 << TWEN); //trigger action to read last byte of data 
-    wait_for_completion;
-
-    stopI2C_Trans(); //final trigger action with stop condition sent
-}
-
-
 //returns TWDR to get data from I2C data register 
 unsigned char read_data(){
     return TWDR;
 }
 
-unsigned char HoldCommunication(unsigned char SLA, unsigned char command){
-    unsigned char data; //2 bytes of data from sensor
+unsigned int HoldCommunication(unsigned char SLA, unsigned char command){
+    unsigned int data; //2 bytes of data from sensor
     
     startI2C_Trans(SLA);
     

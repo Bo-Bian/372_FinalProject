@@ -28,25 +28,12 @@ void stopI2C_Trans();
 
 void write(unsigned char data);
 
-void read_from(unsigned char SLA, unsigned char MEMADDRESS);
-/*
-- Start a transmission to the SLA
-- Write to the MEMADDRESS
-- Clear TWINT, initiate start condition, initiate enable
-- Wait for completion
-- Set two wire data register to the SLA + read bit
-- Trigger action + master acknowledge bit
-- Wait for completion
-- Trigger action
-- Wait for completion
-- Trigger action + stop condition
-*/
-
 unsigned char read_data();
 /*
 - Return TWDR
 */
-unsigned char HoldCommunication(unsigned char SLA, unsigned char command);
+
+unsigned int HoldCommunication(unsigned char SLA, unsigned char command);
 //getting 2 bytes of data from sensor as shown in Hold Master Communication Sequence on pg.11 of datasheet
 
 

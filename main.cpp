@@ -8,23 +8,22 @@
 
 #define TEMPMEASURE 0xE3
 #define HUMIDMEASURE 0xE5
+#define SOFT_RESET 0xFE
 
 #define SLA 0x40
-
-#define PWR_MGMT  0x6B //power mangement sleep mode
-#define WAKEUP 0x00 //wake it up by writing 00 to it
 
 int main(){
   Serial.begin(9600); // using serial port to print values from I2C bus
   initI2C();  // initialize I2C and set bit rate
 
   startI2C_Trans(SLA);
-  write(PWR_MGMT);// address on SLA for Power Management
-  write(WAKEUP); // send data to Wake up from sleep mode
+  write(SOFT_RESET); //implementing a soft reset before taking any readings from the sensor
   stopI2C_Trans();
 
-  unsigned char tempReading;
+  unsigned int tempReading;
+  unsigned int humidReading;
   float tempOut;
+  float humidOut;
 
   while(1){
 
@@ -33,7 +32,16 @@ int main(){
     //Serial.println(tempReading, HEX);
 
     tempOut = ((((float)tempReading)/(65536.0)) * 175.72) - 46.85;
-    Serial.println(tempOut);
+    //Serial.println(tempOut);
+
+    humidReading = HoldCommunication(SLA, HUMIDMEASURE);
+    humidReading = (humidReading & 0xFFFC);
+    //Serial.println(humidReading, HEX);
+
+    humidOut = ((((float)humidReading)/(65536.0)) * 125.0) - 6.0;
+    Serial.println(humidOut);
+
+
 
   }
 
