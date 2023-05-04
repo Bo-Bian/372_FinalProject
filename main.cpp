@@ -30,8 +30,9 @@ int main(){
 
     tempReading = HoldCommunication(SLA, TEMPMEASURE);
     tempReading = (tempReading & 0xFFFC);
+    //Serial.println(tempReading, HEX);
 
-    tempOut = ((((float) tempReading) / (2^16)) * 175.72) - 46.85;
+    tempOut = ((((float)tempReading)/(65536)) * 175.72) - 46.85;
     Serial.println(tempOut);
 
   }

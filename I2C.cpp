@@ -101,7 +101,7 @@ unsigned char HoldCommunication(unsigned char SLA, unsigned char command){
 
     data = (TWDR << 8); //first byte MSB of data
 
-    TWCR = (1 << TWINT) | (1 << TWEN); (1 << TWEA); //master NACK bit (because we don't care about CheckSum)
+    TWCR = (1 << TWINT) | (1 << TWEN); //master NACK bit (because we don't care about CheckSum)
     wait_for_completion;
 
     data = (data | TWDR); //second byte LSB of data
