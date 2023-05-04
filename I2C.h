@@ -46,8 +46,8 @@ unsigned char read_data();
 /*
 - Return TWDR
 */
-unsigned int NoHoldCommunication();
-//getting 2 bytes of data from sensor as shown in No Hold Master Communication Sequence on pg.11 of datasheet
+unsigned char HoldCommunication(unsigned char SLA, unsigned char command);
+//getting 2 bytes of data from sensor as shown in Hold Master Communication Sequence on pg.11 of datasheet
 
 
 #endif

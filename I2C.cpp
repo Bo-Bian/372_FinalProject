@@ -79,22 +79,34 @@ unsigned char read_data(){
     return TWDR;
 }
 
-unsigned int NoHoldData(unsigned char command){
-    unsigned int data; //2 bytes of data from sensor
+unsigned char HoldCommunication(unsigned char SLA, unsigned char command){
+    unsigned char data; //2 bytes of data from sensor
+    
+    startI2C_Trans(SLA);
+    
     write(command);
+    
 
-    TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTA); //re - start command to wait for slave ACK
-    wait_for_completion; // pre-defined function to wait for the slave to finish receiving data from master
+    TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTA); //re-start command to wait for sensor ACK
+    wait_for_completion;
+
+    TWDR = (SLA << 1) | READ_BIT; //slave address + read bit into data register
+
+    TWCR = (1 << TWINT) | (1 << TWEN); //trigger action to begin taking measurement
+    wait_for_completion;
+
 
     TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWEA); //master ACK bit
     wait_for_completion;
 
     data = (TWDR << 8); //first byte MSB of data
 
-    TWCR = (1 << TWINT) | (1 << TWEN); (1 << TWEA); //master ACK bit
+    TWCR = (1 << TWINT) | (1 << TWEN); (1 << TWEA); //master NACK bit (because we don't care about CheckSum)
     wait_for_completion;
 
     data = (data | TWDR); //second byte LSB of data
+
+    stopI2C_Trans();
 
     return data;
 }
